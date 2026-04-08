@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>业务场景导航中心</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #eef2f7;
+      min-height: 100vh;
+      color: #1a1a2e;
+    }
+
+    /* Page header */
+    .page-head {
+      background: #fff;
+      border-bottom: 1px solid #dde3ec;
+      padding: 20px 32px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .page-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .title-bar {
+      width: 4px;
+      height: 22px;
+      background: #3b7dd8;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+    .page-sub {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 14px;
+      padding-left: 14px;
+      line-height: 1.6;
+    }
+    .tab-row {
+      display: flex;
+      padding-left: 14px;
+    }
+    .tab {
+      font-size: 13px;
+      color: #3b7dd8;
+      padding: 8px 18px;
+      border-bottom: 2px solid #3b7dd8;
+      font-weight: 500;
+    }
+
+    /* Content */
+    .content {
+      padding: 20px 24px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Group card */
+    .group-card {
+      background: #fff;
+      border: 1px solid #dde3ec;
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .group-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a2e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .group-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .dot-blue   { background: #3b7dd8; }
+    .dot-teal   { background: #1a9a7a; }
+    .dot-green  { background: #3a8c2a; }
+    .dot-purple { background: #5340b7; }
+
+    .group-count {
+      font-size: 11px;
+      color: #6b7280;
+      background: #f5f7fa;
+      padding: 2px 10px;
+      border-radius: 10px;
+      border: 1px solid #dde3ec;
+    }
+
+    /* Scene cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    /* Scene card */
+    .sc {
+      background: #fff;
+      border: 1px solid #dde3ec;
+      border-radius: 8px;
+      padding: 14px 14px 28px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+    }
+    .sc:hover {
+      border-color: #3b7dd8;
+      box-shadow: 0 2px 10px rgba(59, 125, 216, 0.12);
+    }
+    .sc-top-line {
+      height: 3px;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      border-radius: 8px 8px 0 0;
+    }
+    .line-blue   { background: #3b7dd8; }
+    .line-teal   { background: #1a9a7a; }
+    .line-green  { background: #3a8c2a; }
+    .line-purple { background: #5340b7; }
+
+    .sc-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .badge-blue   { background: #e8f0fc; color: #3b7dd8; }
+    .badge-teal   { background: #e0f5ef; color: #1a9a7a; }
+    .badge-green  { background: #e4f2dc; color: #3a8c2a; }
+    .badge-purple { background: #edeaf9; color: #5340b7; }
+
+    .sc-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+    .sc-bp {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .sc-link {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      font-size: 11px;
+      color: #3b7dd8;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .sc:hover .sc-link {
+      opacity: 1;
+    }
+
+    /* Pending card */
+    .sc-pending {
+      background: #fafbfc;
+      border: 1px dashed #dde3ec;
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #c0c7d0;
+      font-size: 12px;
+      min-height: 80px;
+    }
+
+    @media (max-width: 900px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .content { padding: 16px; }
+      .page-head { padding: 16px 16px 0; }
+    }
+    @media (max-width: 500px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-head">
+    <div class="page-title-row">
+      <div class="title-bar"></div>
+      <span class="page-title">业务场景导航中心</span>
+    </div>
+    <div class="page-sub">
+      覆盖大社区 · 大商业 · 大基建 · 大审核 四大核心场景 &nbsp;｜&nbsp; 快速访问各业务场景内帐下钻分析与机会点推演
+    </div>
+    <div class="tab-row">
+      <div class="tab">全部场景</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 大社区 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name">
+          <div class="group-dot dot-blue"></div>大社区
+        </div>
+        <span class="group-count">3 个常规场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-blue"></div>
+          <span class="sc-badge badge-blue">常规场景</span>
+          <div class="sc-name">社区</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-blue"></div>
+          <span class="sc-badge badge-blue">常规场景</span>
+          <div class="sc-name">搜索</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-blue"></div>
+          <span class="sc-badge badge-blue">常规场景</span>
+          <div class="sc-name">推荐</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 大商业 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name">
+          <div class="group-dot dot-teal"></div>大商业
+        </div>
+        <span class="group-count">2 个常规场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-teal"></div>
+          <span class="sc-badge badge-teal">常规场景</span>
+          <div class="sc-name">广告</div>
+          <div class="sc-bp">科斯</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-teal"></div>
+          <span class="sc-badge badge-teal">常规场景</span>
+          <div class="sc-name">交易</div>
+          <div class="sc-bp">科斯</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 大基建 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name">
+          <div class="group-dot dot-green"></div>大基建
+        </div>
+        <span class="group-count">4 个常规场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">常规场景</span>
+          <div class="sc-name">基建</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="https://angelchang-dashboard.github.io/infra-dashboard/" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">常规场景</span>
+          <div class="sc-name">数据</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">常规场景</span>
+          <div class="sc-name">风控</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">常规场景</span>
+          <div class="sc-name">多媒体</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 大审核 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name">
+          <div class="group-dot dot-purple"></div>大审核
+        </div>
+        <span class="group-count">1 个常规场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-purple"></div>
+          <span class="sc-badge badge-purple">常规场景</span>
+          <div class="sc-name">机审平台</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

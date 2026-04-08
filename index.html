@@ -6,186 +6,146 @@
   <title>业务场景导航中心</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
+    html, body { height: 100%; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       background: #eef2f7;
       color: #1a1a2e;
-      display: flex;
-      flex-direction: column;
     }
 
+    /* 页头：白色区域更高 */
     .page-head {
       background: #fff;
       border-bottom: 1px solid #dde3ec;
-      padding: 1.2vh 80px 0;
-      flex-shrink: 0;
+      padding: 32px 80px 28px;
     }
     .page-title-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 0.3vh;
+      margin-bottom: 8px;
     }
     .title-bar {
       width: 4px;
-      height: 2.2vh;
+      height: 26px;
       background: #3b7dd8;
       border-radius: 2px;
       flex-shrink: 0;
     }
-    .page-title {
-      font-size: clamp(16px, 1.6vh, 24px);
-      font-weight: 600;
-      color: #1a1a2e;
-    }
-    .page-sub {
-      font-size: clamp(11px, 1.2vh, 14px);
-      color: #6b7280;
-      margin-bottom: 1vh;
-      padding-left: 14px;
-      line-height: 1.5;
-    }
-    .tab-row { display: flex; padding-left: 14px; }
-    .tab {
-      font-size: clamp(12px, 1.3vh, 15px);
-      color: #3b7dd8;
-      padding: 0.6vh 20px;
-      border-bottom: 2px solid #3b7dd8;
-      font-weight: 500;
+    .page-title { font-size: 22px; font-weight: 600; color: #1a1a2e; }
+    .page-sub { font-size: 13px; color: #6b7280; padding-left: 14px; line-height: 1.6; }
+
+    .content { padding: 24px 80px 32px; }
+
+    .scene-columns {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
     }
 
-    .content {
-      padding: 1vh 80px 1vh;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8vh;
-      min-height: 0;
-    }
+    .col { display: flex; flex-direction: column; gap: 10px; }
 
-    .group-card {
+    /* 大场景按钮：固定高度，比之前高一点 */
+    .big-btn {
+      width: 100%;
+      height: 80px;
       background: #fff;
       border: 1px solid #dde3ec;
       border-radius: 8px;
-      padding: 1vh 16px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-    .group-head {
+      padding: 0 20px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.8vh;
-      padding-bottom: 0.6vh;
-      border-bottom: 1px solid #eef2f7;
-      flex-shrink: 0;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      user-select: none;
     }
-    .group-name {
-      font-size: clamp(13px, 1.4vh, 16px);
-      font-weight: 600;
-      color: #1a1a2e;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .group-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .big-btn:hover { border-color: #3b7dd8; box-shadow: 0 2px 8px rgba(59,125,216,0.1); }
+    .big-btn.open { border-color: #3b7dd8; background: #f0f6ff; }
+
+    .big-btn-left { display: flex; align-items: center; gap: 10px; }
+    .big-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
     .dot-blue   { background: #3b7dd8; }
     .dot-teal   { background: #1a9a7a; }
     .dot-green  { background: #3a8c2a; }
     .dot-purple { background: #5340b7; }
 
-    .group-count {
-      font-size: clamp(10px, 1.1vh, 13px);
+    .big-label { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+    .big-count {
+      font-size: 12px;
       color: #6b7280;
       background: #f5f7fa;
       padding: 2px 10px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid #dde3ec;
     }
+    .chevron { font-size: 10px; color: #9ca3af; transition: transform 0.2s; flex-shrink: 0; }
+    .big-btn.open .chevron { transform: rotate(180deg); }
 
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.8vh;
-      flex: 1;
-      min-height: 0;
-    }
+    /* 小场景列表 */
+    .sub-list { display: none; flex-direction: column; gap: 8px; }
+    .sub-list.open { display: flex; }
 
+    /* 小场景卡片：固定高度，比之前高一点 */
     .sc {
+      height: 130px;
       background: #fff;
       border: 1px solid #dde3ec;
       border-radius: 8px;
-      padding: 1.2vh 14px;
+      padding: 16px 16px 16px;
       cursor: pointer;
-      transition: border-color 0.15s, box-shadow 0.15s;
       position: relative;
       overflow: hidden;
       text-decoration: none;
       display: flex;
-      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .sc:hover {
-      border-color: #3b7dd8;
-      box-shadow: 0 2px 10px rgba(59, 125, 216, 0.12);
-    }
+    .sc:hover { border-color: #3b7dd8; box-shadow: 0 2px 8px rgba(59,125,216,0.1); }
+
     .sc-top-line {
-      height: 3px;
+      height: 100%;
+      width: 3px;
       position: absolute;
-      top: 0; left: 0; right: 0;
-      border-radius: 8px 8px 0 0;
+      top: 0; left: 0; bottom: 0;
+      border-radius: 8px 0 0 8px;
     }
     .line-blue   { background: #3b7dd8; }
     .line-teal   { background: #1a9a7a; }
     .line-green  { background: #3a8c2a; }
     .line-purple { background: #5340b7; }
 
-    /* 常规场景 badge — 字大一号，下方间距加大 */
+    .sc-info { padding-left: 8px; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+
     .sc-badge {
       display: inline-block;
-      font-size: clamp(11px, 1.2vh, 14px);
-      padding: 3px 9px;
-      border-radius: 3px;
-      margin-bottom: 1vh;
-      font-weight: 500;
       align-self: flex-start;
-      flex-shrink: 0;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-bottom: 6px;
+      font-weight: 500;
     }
     .badge-blue   { background: #e8f0fc; color: #3b7dd8; }
     .badge-teal   { background: #e0f5ef; color: #1a9a7a; }
     .badge-green  { background: #e4f2dc; color: #3a8c2a; }
     .badge-purple { background: #edeaf9; color: #5340b7; }
 
-    /* 场景名 */
-    .sc-name {
-      font-size: clamp(13px, 1.5vh, 18px);
-      font-weight: 600;
-      color: #1a1a2e;
-      margin-bottom: 1vh;  /* 加大与BP名的间距 */
-    }
-
-    /* BP 名 */
-    .sc-bp {
-      font-size: clamp(10px, 1.1vh, 13px);
-      color: #9ca3af;
-      flex: 1;
-    }
+    .sc-name { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+    .sc-bp { font-size: 12px; color: #9ca3af; }
 
     .sc-link {
-      align-self: flex-end;
-      font-size: clamp(10px, 1.1vh, 13px);
+      font-size: 12px;
       color: #3b7dd8;
       opacity: 0;
       transition: opacity 0.15s;
-      margin-top: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
+      position: absolute;
+      bottom: 14px;
+      right: 16px;
     }
     .sc:hover .sc-link { opacity: 1; }
 
@@ -193,9 +153,8 @@
       .page-head, .content { padding-left: 40px; padding-right: 40px; }
     }
     @media (max-width: 900px) {
-      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .scene-columns { grid-template-columns: repeat(2, 1fr); }
       .page-head, .content { padding-left: 20px; padding-right: 20px; }
-      html, body { overflow: auto; }
     }
 
     /* ── Lock Screen ── */
@@ -222,9 +181,7 @@
     .lock-btn { width: 100%; padding: 11px; background: #3b7dd8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
     .lock-btn:hover { background: #2563c8; }
     .lock-err { font-size: 12px; color: #ef4444; margin-top: 10px; min-height: 18px; }
-    @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
-    #app { display: none; flex-direction: column; height: 100%; }
-    #app.visible { display: flex; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
   </style>
 </head>
 <body>
@@ -252,9 +209,7 @@
     </div>
   </div>
 
-  <!-- ══ MAIN APP ══ -->
-  <div id="app">
-    <div class="page-head">
+  <div class="page-head">
     <div class="page-title-row">
       <div class="title-bar"></div>
       <span class="page-title">业务场景导航中心</span>
@@ -262,147 +217,236 @@
     <div class="page-sub">
       覆盖大社区 · 大商业 · 大基建 · 大审核 四大核心场景 &nbsp;｜&nbsp; 快速访问各业务场景内帐下钻分析与机会点推演
     </div>
-    <div class="tab-row">
-      <div class="tab">全部场景</div>
-    </div>
   </div>
 
   <div class="content">
+    <div class="scene-columns">
 
-    <!-- 大社区 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name"><div class="group-dot dot-blue"></div>大社区</div>
-        <span class="group-count">3 个主站场景</span>
+      <!-- 大社区 -->
+      <div class="col">
+        <button class="big-btn" onclick="toggle('community')">
+          <div class="big-btn-left">
+            <div class="big-dot dot-blue"></div>
+            <span class="big-label">大社区</span>
+            <span class="big-count">3 个主站场景</span>
+          </div>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="sub-list" id="drop-community">
+          <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/" target="_blank">
+            <div class="sc-top-line line-blue"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-blue">主站场景</div>
+              <div class="sc-name">推荐</div>
+              <div class="sc-bp">月兔</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/?scene=搜索" target="_blank">
+            <div class="sc-top-line line-blue"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-blue">主站场景</div>
+              <div class="sc-name">搜索</div>
+              <div class="sc-bp">月兔</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/?scene=社区" target="_blank">
+            <div class="sc-top-line line-blue"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-blue">主站场景</div>
+              <div class="sc-name">社区</div>
+              <div class="sc-bp">月兔</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+        </div>
       </div>
-      <div class="cards-grid">
-        <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/" target="_blank">
-          <div class="sc-top-line line-blue"></div>
-          <span class="sc-badge badge-blue">主站场景</span>
-          <div class="sc-name">推荐</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/?scene=搜索" target="_blank">
-          <div class="sc-top-line line-blue"></div>
-          <span class="sc-badge badge-blue">主站场景</span>
-          <div class="sc-name">搜索</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/?scene=社区" target="_blank">
-          <div class="sc-top-line line-blue"></div>
-          <span class="sc-badge badge-blue">主站场景</span>
-          <div class="sc-name">社区</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
+
+      <!-- 大商业 -->
+      <div class="col">
+        <button class="big-btn" onclick="toggle('commerce')">
+          <div class="big-btn-left">
+            <div class="big-dot dot-teal"></div>
+            <span class="big-label">大商业</span>
+            <span class="big-count">2 个主站场景</span>
+          </div>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="sub-list" id="drop-commerce">
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-teal"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-teal">主站场景</div>
+              <div class="sc-name">广告</div>
+              <div class="sc-bp">科斯</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-teal"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-teal">主站场景</div>
+              <div class="sc-name">交易</div>
+              <div class="sc-bp">科斯</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+        </div>
       </div>
+
+      <!-- 大基建 -->
+      <div class="col">
+        <button class="big-btn" onclick="toggle('infra')">
+          <div class="big-btn-left">
+            <div class="big-dot dot-green"></div>
+            <span class="big-label">大基建</span>
+            <span class="big-count">4 个主站场景</span>
+          </div>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="sub-list" id="drop-infra">
+          <a class="sc" href="https://angelchang-dashboard.github.io/infra-dashboard/" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-green">主站场景</div>
+              <div class="sc-name">数据</div>
+              <div class="sc-bp">安玖</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-green">主站场景</div>
+              <div class="sc-name">基建</div>
+              <div class="sc-bp">安玖</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-green">主站场景</div>
+              <div class="sc-name">风控</div>
+              <div class="sc-bp">安玖</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-green">主站场景</div>
+              <div class="sc-name">多媒体</div>
+              <div class="sc-bp">安玖</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 大审核 -->
+      <div class="col">
+        <button class="big-btn" onclick="toggle('audit')">
+          <div class="big-btn-left">
+            <div class="big-dot dot-purple"></div>
+            <span class="big-label">大审核</span>
+            <span class="big-count">1 个业务场景</span>
+          </div>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="sub-list" id="drop-audit">
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-purple"></div>
+            <div class="sc-info">
+              <div class="sc-badge badge-purple">业务场景</div>
+              <div class="sc-name">审核</div>
+              <div class="sc-bp">月兔</div>
+            </div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+        </div>
+      </div>
+
     </div>
-
-    <!-- 大商业 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name"><div class="group-dot dot-teal"></div>大商业</div>
-        <span class="group-count">2 个主站场景</span>
-      </div>
-      <div class="cards-grid">
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-teal"></div>
-          <span class="sc-badge badge-teal">主站场景</span>
-          <div class="sc-name">广告</div>
-          <div class="sc-bp">科斯</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-teal"></div>
-          <span class="sc-badge badge-teal">主站场景</span>
-          <div class="sc-name">交易</div>
-          <div class="sc-bp">科斯</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 大基建 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name"><div class="group-dot dot-green"></div>大基建</div>
-        <span class="group-count">4 个主站场景</span>
-      </div>
-      <div class="cards-grid">
-        <a class="sc" href="https://angelchang-dashboard.github.io/infra-dashboard/" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">主站场景</span>
-          <div class="sc-name">数据</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">主站场景</span>
-          <div class="sc-name">基建</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">主站场景</span>
-          <div class="sc-name">风控</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">主站场景</span>
-          <div class="sc-name">多媒体</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 大审核 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name"><div class="group-dot dot-purple"></div>大审核</div>
-        <span class="group-count">1 个业务场景</span>
-      </div>
-      <div class="cards-grid">
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-purple"></div>
-          <span class="sc-badge badge-purple">业务场景</span>
-          <div class="sc-name">审核</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-      </div>
-    </div>
-
   </div>
 
-  </div><!-- /#app -->
+  <script>
+    var current = null;
+    var items = {
+      community: { btn: null, drop: null },
+      commerce:  { btn: null, drop: null },
+      infra:     { btn: null, drop: null },
+      audit:     { btn: null, drop: null }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      Object.keys(items).forEach(function(k) {
+        items[k].drop = document.getElementById('drop-' + k);
+        items[k].btn  = items[k].drop.previousElementSibling;
+      });
+    });
+
+    function toggle(key) {
+      var isOpen = current === key;
+      if (current) {
+        items[current].btn.classList.remove('open');
+        items[current].drop.classList.remove('open');
+        current = null;
+      }
+      if (!isOpen) {
+        items[key].btn.classList.add('open');
+        items[key].drop.classList.add('open');
+        current = key;
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!current) return;
+      var col = items[current].btn.closest('.col');
+      if (!col.contains(e.target)) {
+        items[current].btn.classList.remove('open');
+        items[current].drop.classList.remove('open');
+        current = null;
+      }
+    });
+  </script>
+
 
   <script>
     (function(){
-      var PASS='techchangeworld', KEY='portal_auth';
-      var lock=document.getElementById('lock-screen');
-      var app=document.getElementById('app');
-      var inp=document.getElementById('pwd-input');
-      var err=document.getElementById('lock-err');
-      var eyeIcon=document.getElementById('eye-icon');
-      if(sessionStorage.getItem(KEY)==='1'){ lock.classList.add('hidden'); app.classList.add('visible'); return; }
-      function unlock(){
-        if(inp.value.trim()===PASS){
-          sessionStorage.setItem(KEY,'1'); lock.classList.add('hidden'); app.classList.add('visible');
+      var PASS = 'techchangeworld';
+      var KEY  = 'portal_auth';
+      // 通过 URL 携带 ?access=techchangeworld 可免密直接访问
+      var params = new URLSearchParams(window.location.search);
+      var accessKey = params.get('access');
+      var lock = document.getElementById('lock-screen');
+
+      function showApp() {
+        lock.classList.add('hidden');
+        sessionStorage.setItem(KEY, '1');
+      }
+
+      if (accessKey === PASS || sessionStorage.getItem(KEY) === '1') {
+        showApp(); return;
+      }
+
+      var inp     = document.getElementById('pwd-input');
+      var err     = document.getElementById('lock-err');
+      var eyeIcon = document.getElementById('eye-icon');
+
+      function unlock() {
+        if (inp.value.trim() === PASS) {
+          showApp();
         } else {
-          err.textContent='密码错误，请重试'; inp.classList.add('error'); inp.value=''; inp.focus();
-          setTimeout(function(){ inp.classList.remove('error'); err.textContent=''; },1500);
+          err.textContent = '密码错误，请重试';
+          inp.classList.add('error'); inp.value = ''; inp.focus();
+          setTimeout(function(){ inp.classList.remove('error'); err.textContent = ''; }, 1500);
         }
       }
-      document.getElementById('unlock-btn').addEventListener('click',unlock);
-      inp.addEventListener('keydown',function(e){ if(e.key==='Enter') unlock(); });
-      document.getElementById('eye-btn').addEventListener('click',function(){
+      document.getElementById('unlock-btn').addEventListener('click', unlock);
+      inp.addEventListener('keydown', function(e){ if(e.key==='Enter') unlock(); });
+      document.getElementById('eye-btn').addEventListener('click', function(){
         if(inp.type==='password'){
           inp.type='text';
           eyeIcon.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';

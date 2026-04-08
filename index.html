@@ -6,10 +6,196 @@
   <title>业务场景导航中心</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background: #eef2f7; color: #1a1a2e; display: flex; flex-direction: column;
+      background: #eef2f7;
+      color: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-head {
+      background: #fff;
+      border-bottom: 1px solid #dde3ec;
+      padding: 1.2vh 80px 0;
+      flex-shrink: 0;
+    }
+    .page-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0.3vh;
+    }
+    .title-bar {
+      width: 4px;
+      height: 2.2vh;
+      background: #3b7dd8;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .page-title {
+      font-size: clamp(16px, 1.6vh, 24px);
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+    .page-sub {
+      font-size: clamp(11px, 1.2vh, 14px);
+      color: #6b7280;
+      margin-bottom: 1vh;
+      padding-left: 14px;
+      line-height: 1.5;
+    }
+    .tab-row { display: flex; padding-left: 14px; }
+    .tab {
+      font-size: clamp(12px, 1.3vh, 15px);
+      color: #3b7dd8;
+      padding: 0.6vh 20px;
+      border-bottom: 2px solid #3b7dd8;
+      font-weight: 500;
+    }
+
+    .content {
+      padding: 1vh 80px 1vh;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8vh;
+      min-height: 0;
+    }
+
+    .group-card {
+      background: #fff;
+      border: 1px solid #dde3ec;
+      border-radius: 8px;
+      padding: 1vh 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.8vh;
+      padding-bottom: 0.6vh;
+      border-bottom: 1px solid #eef2f7;
+      flex-shrink: 0;
+    }
+    .group-name {
+      font-size: clamp(13px, 1.4vh, 16px);
+      font-weight: 600;
+      color: #1a1a2e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .group-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-blue   { background: #3b7dd8; }
+    .dot-teal   { background: #1a9a7a; }
+    .dot-green  { background: #3a8c2a; }
+    .dot-purple { background: #5340b7; }
+
+    .group-count {
+      font-size: clamp(10px, 1.1vh, 13px);
+      color: #6b7280;
+      background: #f5f7fa;
+      padding: 2px 10px;
+      border-radius: 10px;
+      border: 1px solid #dde3ec;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.8vh;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .sc {
+      background: #fff;
+      border: 1px solid #dde3ec;
+      border-radius: 8px;
+      padding: 1.2vh 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .sc:hover {
+      border-color: #3b7dd8;
+      box-shadow: 0 2px 10px rgba(59, 125, 216, 0.12);
+    }
+    .sc-top-line {
+      height: 3px;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      border-radius: 8px 8px 0 0;
+    }
+    .line-blue   { background: #3b7dd8; }
+    .line-teal   { background: #1a9a7a; }
+    .line-green  { background: #3a8c2a; }
+    .line-purple { background: #5340b7; }
+
+    /* 常规场景 badge — 字大一号，下方间距加大 */
+    .sc-badge {
+      display: inline-block;
+      font-size: clamp(11px, 1.2vh, 14px);
+      padding: 3px 9px;
+      border-radius: 3px;
+      margin-bottom: 1vh;
+      font-weight: 500;
+      align-self: flex-start;
+      flex-shrink: 0;
+    }
+    .badge-blue   { background: #e8f0fc; color: #3b7dd8; }
+    .badge-teal   { background: #e0f5ef; color: #1a9a7a; }
+    .badge-green  { background: #e4f2dc; color: #3a8c2a; }
+    .badge-purple { background: #edeaf9; color: #5340b7; }
+
+    /* 场景名 */
+    .sc-name {
+      font-size: clamp(13px, 1.5vh, 18px);
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 1vh;  /* 加大与BP名的间距 */
+    }
+
+    /* BP 名 */
+    .sc-bp {
+      font-size: clamp(10px, 1.1vh, 13px);
+      color: #9ca3af;
+      flex: 1;
+    }
+
+    .sc-link {
+      align-self: flex-end;
+      font-size: clamp(10px, 1.1vh, 13px);
+      color: #3b7dd8;
+      opacity: 0;
+      transition: opacity 0.15s;
+      margin-top: auto;
+    }
+    .sc:hover .sc-link { opacity: 1; }
+
+    @media (max-width: 1024px) {
+      .page-head, .content { padding-left: 40px; padding-right: 40px; }
+    }
+    @media (max-width: 900px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-head, .content { padding-left: 20px; padding-right: 20px; }
+      html, body { overflow: auto; }
     }
 
     /* ── Lock Screen ── */
@@ -24,80 +210,21 @@
       padding: 40px 36px 36px; width: 360px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.25); text-align: center;
     }
-    .lock-icon {
-      width: 56px; height: 56px; background: #eef2f7; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; margin: 0 auto 18px;
-    }
+    .lock-icon { width: 56px; height: 56px; background: #eef2f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
     .lock-title { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
     .lock-sub   { font-size: 12px; color: #6b7280; margin-bottom: 24px; line-height: 1.6; }
     .lock-input-wrap { position: relative; margin-bottom: 14px; }
-    .lock-input {
-      width: 100%; padding: 11px 40px 11px 14px;
-      border: 1.5px solid #dde3ec; border-radius: 8px;
-      font-size: 14px; color: #1a1a2e; outline: none;
-      transition: border-color 0.15s; letter-spacing: 1px;
-    }
+    .lock-input { width: 100%; padding: 11px 40px 11px 14px; border: 1.5px solid #dde3ec; border-radius: 8px; font-size: 14px; color: #1a1a2e; outline: none; transition: border-color 0.15s; letter-spacing: 1px; }
     .lock-input:focus { border-color: #3b7dd8; }
     .lock-input.error { border-color: #ef4444; animation: shake 0.3s; }
-    .eye-btn {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer; color: #9ca3af;
-      padding: 0; display: flex; align-items: center;
-    }
+    .eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9ca3af; padding: 0; display: flex; align-items: center; }
     .eye-btn:hover { color: #3b7dd8; }
-    .lock-btn {
-      width: 100%; padding: 11px; background: #3b7dd8; color: #fff;
-      border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
-      cursor: pointer; transition: background 0.15s;
-    }
+    .lock-btn { width: 100%; padding: 11px; background: #3b7dd8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
     .lock-btn:hover { background: #2563c8; }
     .lock-err { font-size: 12px; color: #ef4444; margin-top: 10px; min-height: 18px; }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); }
-    }
-
-    /* ── App ── */
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
     #app { display: none; flex-direction: column; height: 100%; }
     #app.visible { display: flex; }
-
-    .page-head { background: #fff; border-bottom: 1px solid #dde3ec; padding: 1.2vh 80px 0; flex-shrink: 0; }
-    .page-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.3vh; }
-    .title-bar { width: 4px; height: 2.2vh; background: #3b7dd8; border-radius: 2px; flex-shrink: 0; }
-    .page-title { font-size: clamp(16px, 1.6vh, 24px); font-weight: 600; color: #1a1a2e; }
-    .page-sub { font-size: clamp(11px, 1.2vh, 14px); color: #6b7280; margin-bottom: 1vh; padding-left: 14px; line-height: 1.5; }
-    .tab-row { display: flex; padding-left: 14px; }
-    .tab { font-size: clamp(12px, 1.3vh, 15px); color: #3b7dd8; padding: 0.6vh 20px; border-bottom: 2px solid #3b7dd8; font-weight: 500; }
-
-    .content { padding: 1vh 80px 1vh; flex: 1; display: flex; flex-direction: column; gap: 0.8vh; min-height: 0; }
-    .group-card { background: #fff; border: 1px solid #dde3ec; border-radius: 8px; padding: 1vh 16px; flex: 1; display: flex; flex-direction: column; min-height: 0; }
-    .group-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8vh; padding-bottom: 0.6vh; border-bottom: 1px solid #eef2f7; flex-shrink: 0; }
-    .group-name { font-size: clamp(13px, 1.4vh, 16px); font-weight: 600; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
-    .group-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .dot-blue   { background: #3b7dd8; } .dot-teal { background: #1a9a7a; }
-    .dot-green  { background: #3a8c2a; } .dot-purple { background: #5340b7; }
-    .group-count { font-size: clamp(10px, 1.1vh, 13px); color: #6b7280; background: #f5f7fa; padding: 2px 10px; border-radius: 10px; border: 1px solid #dde3ec; }
-
-    .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8vh; flex: 1; min-height: 0; }
-    .sc {
-      background: #fff; border: 1px solid #dde3ec; border-radius: 8px; padding: 1.2vh 14px;
-      cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
-      position: relative; overflow: hidden; text-decoration: none; display: flex; flex-direction: column;
-    }
-    .sc:hover { border-color: #3b7dd8; box-shadow: 0 2px 10px rgba(59,125,216,0.12); }
-    .sc-top-line { height: 3px; position: absolute; top: 0; left: 0; right: 0; border-radius: 8px 8px 0 0; }
-    .line-blue { background: #3b7dd8; } .line-teal { background: #1a9a7a; }
-    .line-green { background: #3a8c2a; } .line-purple { background: #5340b7; }
-    .sc-badge { display: inline-block; font-size: clamp(11px, 1.2vh, 14px); padding: 3px 9px; border-radius: 3px; margin-bottom: 1vh; font-weight: 500; align-self: flex-start; flex-shrink: 0; }
-    .badge-blue   { background: #e8f0fc; color: #3b7dd8; } .badge-teal   { background: #e0f5ef; color: #1a9a7a; }
-    .badge-green  { background: #e4f2dc; color: #3a8c2a; } .badge-purple { background: #edeaf9; color: #5340b7; }
-    .sc-name { font-size: clamp(13px, 1.5vh, 18px); font-weight: 600; color: #1a1a2e; margin-bottom: 1vh; }
-    .sc-bp   { font-size: clamp(10px, 1.1vh, 13px); color: #9ca3af; flex: 1; }
-    .sc-link { align-self: flex-end; font-size: clamp(10px, 1.1vh, 13px); color: #3b7dd8; opacity: 0; transition: opacity 0.15s; margin-top: auto; }
-    .sc:hover .sc-link { opacity: 1; }
-
-    @media (max-width: 1024px) { .page-head, .content { padding-left: 40px; padding-right: 40px; } }
-    @media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } .page-head, .content { padding-left: 20px; padding-right: 20px; } html, body { overflow: auto; } }
-    @media (max-width: 500px) { .lock-box { width: 90vw; padding: 32px 24px 28px; } }
   </style>
 </head>
 <body>
@@ -128,130 +255,133 @@
   <!-- ══ MAIN APP ══ -->
   <div id="app">
     <div class="page-head">
-      <div class="page-title-row">
-        <div class="title-bar"></div>
-        <span class="page-title">业务场景导航中心</span>
-      </div>
-      <div class="page-sub">
-        覆盖大社区 · 大商业 · 大基建 · 大审核 四大核心场景 &nbsp;｜&nbsp; 快速访问各业务场景内帐下钻分析与机会点推演
-      </div>
-      <div class="tab-row"><div class="tab">全部场景</div></div>
+    <div class="page-title-row">
+      <div class="title-bar"></div>
+      <span class="page-title">业务场景导航中心</span>
     </div>
-
-    <div class="content">
-
-      <!-- 大社区 -->
-      <div class="group-card">
-        <div class="group-head">
-          <div class="group-name"><div class="group-dot dot-blue"></div>大社区</div>
-          <span class="group-count">3 个主战场景</span>
-        </div>
-        <div class="cards-grid">
-          <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/" target="_blank">
-            <div class="sc-top-line line-blue"></div>
-            <span class="sc-badge badge-blue">主战场景</span>
-            <div class="sc-name">推荐</div>
-            <div class="sc-bp">月兔</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-          <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/" target="_blank">
-            <div class="sc-top-line line-blue"></div>
-            <span class="sc-badge badge-blue">主战场景</span>
-            <div class="sc-name">搜索</div>
-            <div class="sc-bp">月兔</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-          <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/" target="_blank">
-            <div class="sc-top-line line-blue"></div>
-            <span class="sc-badge badge-blue">主战场景</span>
-            <div class="sc-name">社区</div>
-            <div class="sc-bp">月兔</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- 大商业 -->
-      <div class="group-card">
-        <div class="group-head">
-          <div class="group-name"><div class="group-dot dot-teal"></div>大商业</div>
-          <span class="group-count">2 个主战场景</span>
-        </div>
-        <div class="cards-grid">
-          <a class="sc" href="#" target="_blank">
-            <div class="sc-top-line line-teal"></div>
-            <span class="sc-badge badge-teal">主战场景</span>
-            <div class="sc-name">广告</div>
-            <div class="sc-bp">科斯</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-          <a class="sc" href="#" target="_blank">
-            <div class="sc-top-line line-teal"></div>
-            <span class="sc-badge badge-teal">主战场景</span>
-            <div class="sc-name">交易</div>
-            <div class="sc-bp">科斯</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- 大基建 -->
-      <div class="group-card">
-        <div class="group-head">
-          <div class="group-name"><div class="group-dot dot-green"></div>大基建</div>
-          <span class="group-count">4 个主战场景</span>
-        </div>
-        <div class="cards-grid">
-          <a class="sc" href="https://angelchang-dashboard.github.io/infra-dashboard/" target="_blank">
-            <div class="sc-top-line line-green"></div>
-            <span class="sc-badge badge-green">主战场景</span>
-            <div class="sc-name">数据</div>
-            <div class="sc-bp">安玖</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-          <a class="sc" href="#" target="_blank">
-            <div class="sc-top-line line-green"></div>
-            <span class="sc-badge badge-green">主战场景</span>
-            <div class="sc-name">基建</div>
-            <div class="sc-bp">安玖</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-          <a class="sc" href="#" target="_blank">
-            <div class="sc-top-line line-green"></div>
-            <span class="sc-badge badge-green">主战场景</span>
-            <div class="sc-name">风控</div>
-            <div class="sc-bp">安玖</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-          <a class="sc" href="#" target="_blank">
-            <div class="sc-top-line line-green"></div>
-            <span class="sc-badge badge-green">主战场景</span>
-            <div class="sc-name">多媒体</div>
-            <div class="sc-bp">安玖</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- 大审核 -->
-      <div class="group-card">
-        <div class="group-head">
-          <div class="group-name"><div class="group-dot dot-purple"></div>大审核</div>
-          <span class="group-count">1 个业务场景</span>
-        </div>
-        <div class="cards-grid">
-          <a class="sc" href="#" target="_blank">
-            <div class="sc-top-line line-purple"></div>
-            <span class="sc-badge badge-purple">业务场景</span>
-            <div class="sc-name">审核</div>
-            <div class="sc-bp">月兔</div>
-            <span class="sc-link">进入 Dashboard ↗</span>
-          </a>
-        </div>
-      </div>
-
+    <div class="page-sub">
+      覆盖大社区 · 大商业 · 大基建 · 大审核 四大核心场景 &nbsp;｜&nbsp; 快速访问各业务场景内帐下钻分析与机会点推演
+    </div>
+    <div class="tab-row">
+      <div class="tab">全部场景</div>
     </div>
   </div>
+
+  <div class="content">
+
+    <!-- 大社区 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name"><div class="group-dot dot-blue"></div>大社区</div>
+        <span class="group-count">3 个主站场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/" target="_blank">
+          <div class="sc-top-line line-blue"></div>
+          <span class="sc-badge badge-blue">主站场景</span>
+          <div class="sc-name">推荐</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/?scene=搜索" target="_blank">
+          <div class="sc-top-line line-blue"></div>
+          <span class="sc-badge badge-blue">主站场景</span>
+          <div class="sc-name">搜索</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="https://freyafeng-ai.github.io/finance-dashboard/?scene=社区" target="_blank">
+          <div class="sc-top-line line-blue"></div>
+          <span class="sc-badge badge-blue">主站场景</span>
+          <div class="sc-name">社区</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 大商业 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name"><div class="group-dot dot-teal"></div>大商业</div>
+        <span class="group-count">2 个主站场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-teal"></div>
+          <span class="sc-badge badge-teal">主站场景</span>
+          <div class="sc-name">广告</div>
+          <div class="sc-bp">科斯</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-teal"></div>
+          <span class="sc-badge badge-teal">主站场景</span>
+          <div class="sc-name">交易</div>
+          <div class="sc-bp">科斯</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 大基建 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name"><div class="group-dot dot-green"></div>大基建</div>
+        <span class="group-count">4 个主站场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="https://angelchang-dashboard.github.io/infra-dashboard/" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">主站场景</span>
+          <div class="sc-name">数据</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">主站场景</span>
+          <div class="sc-name">基建</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">主站场景</span>
+          <div class="sc-name">风控</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-green"></div>
+          <span class="sc-badge badge-green">主站场景</span>
+          <div class="sc-name">多媒体</div>
+          <div class="sc-bp">安玖</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 大审核 -->
+    <div class="group-card">
+      <div class="group-head">
+        <div class="group-name"><div class="group-dot dot-purple"></div>大审核</div>
+        <span class="group-count">1 个业务场景</span>
+      </div>
+      <div class="cards-grid">
+        <a class="sc" href="#" target="_blank">
+          <div class="sc-top-line line-purple"></div>
+          <span class="sc-badge badge-purple">业务场景</span>
+          <div class="sc-name">审核</div>
+          <div class="sc-bp">月兔</div>
+          <span class="sc-link">进入 Dashboard ↗</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  </div><!-- /#app -->
 
   <script>
     (function(){

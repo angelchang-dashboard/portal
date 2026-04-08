@@ -417,27 +417,31 @@
   </div><!-- /#app-body -->
 
   <script>
-    (function(){
+    // 在 DOM 完全加载后执行，确保所有元素都存在
+    document.addEventListener('DOMContentLoaded', function() {
       var PASS = 'techchangeworld';
+      var TOKEN = 'soinIBYI-ZJ8YG-HNtXAQA';
       var KEY  = 'portal_auth';
-      // 通过 URL 携带 ?access=techchangeworld 可免密直接访问
+
       var params = new URLSearchParams(window.location.search);
       var accessKey = params.get('access');
-      var lock = document.getElementById('lock-screen');
 
-      function showApp() {
-        lock.classList.add('hidden');
-        document.getElementById('app-body').style.display = 'block';
-        sessionStorage.setItem(KEY, '1');
-      }
-
-      if (accessKey === 'soinIBYI-ZJ8YG-HNtXAQA' || sessionStorage.getItem(KEY) === '1') {
-        showApp(); return;
-      }
-
+      var lock    = document.getElementById('lock-screen');
+      var appBody = document.getElementById('app-body');
       var inp     = document.getElementById('pwd-input');
       var err     = document.getElementById('lock-err');
       var eyeIcon = document.getElementById('eye-icon');
+
+      function showApp() {
+        lock.style.display = 'none';
+        appBody.style.display = 'block';
+        sessionStorage.setItem(KEY, '1');
+      }
+
+      // 免密条件：URL 携带正确 token，或本次 session 已验证过
+      if (accessKey === TOKEN || sessionStorage.getItem(KEY) === '1') {
+        showApp(); return;
+      }
 
       function unlock() {
         if (inp.value.trim() === PASS) {
@@ -448,6 +452,7 @@
           setTimeout(function(){ inp.classList.remove('error'); err.textContent = ''; }, 1500);
         }
       }
+
       document.getElementById('unlock-btn').addEventListener('click', unlock);
       inp.addEventListener('keydown', function(e){ if(e.key==='Enter') unlock(); });
       document.getElementById('eye-btn').addEventListener('click', function(){
@@ -460,8 +465,7 @@
         }
       });
       inp.focus();
-    })();
+    });
   </script>
 
 </body>
-</html>

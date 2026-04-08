@@ -14,6 +14,108 @@
       color: #1a1a2e;
     }
 
+    /* ── Lock Screen ── */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: linear-gradient(135deg, #1d3a6e 0%, #1e4db7 50%, #3b7dd8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #lock-screen.hidden { display: none; }
+
+    .lock-box {
+      background: rgba(255,255,255,0.97);
+      border-radius: 16px;
+      padding: 40px 36px 36px;
+      width: 360px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+    .lock-icon {
+      width: 56px;
+      height: 56px;
+      background: #eef2f7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+    .lock-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+    .lock-sub {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .lock-input-wrap {
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .lock-input {
+      width: 100%;
+      padding: 11px 40px 11px 14px;
+      border: 1.5px solid #dde3ec;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #1a1a2e;
+      outline: none;
+      transition: border-color 0.15s;
+      letter-spacing: 1px;
+    }
+    .lock-input:focus { border-color: #3b7dd8; }
+    .lock-input.error { border-color: #ef4444; animation: shake 0.3s; }
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+    .eye-btn:hover { color: #3b7dd8; }
+    .lock-btn {
+      width: 100%;
+      padding: 11px;
+      background: #3b7dd8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .lock-btn:hover { background: #2563c8; }
+    .lock-err {
+      font-size: 12px;
+      color: #ef4444;
+      margin-top: 10px;
+      min-height: 18px;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%,60% { transform: translateX(-6px); }
+      40%,80% { transform: translateX(6px); }
+    }
+
+    /* ── Main App (hidden until unlocked) ── */
+    #app { display: none; }
+    #app.visible { display: block; }
+
     /* Page header */
     .page-head {
       background: #fff;
@@ -93,11 +195,7 @@
       align-items: center;
       gap: 8px;
     }
-    .group-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
+    .group-dot { width: 8px; height: 8px; border-radius: 50%; }
     .dot-blue   { background: #3b7dd8; }
     .dot-teal   { background: #1a9a7a; }
     .dot-green  { background: #3a8c2a; }
@@ -134,7 +232,7 @@
     }
     .sc:hover {
       border-color: #3b7dd8;
-      box-shadow: 0 2px 10px rgba(59, 125, 216, 0.12);
+      box-shadow: 0 2px 10px rgba(59,125,216,0.12);
     }
     .sc-top-line {
       height: 3px;
@@ -166,10 +264,7 @@
       color: #1a1a2e;
       margin-bottom: 4px;
     }
-    .sc-bp {
-      font-size: 11px;
-      color: #9ca3af;
-    }
+    .sc-bp { font-size: 11px; color: #9ca3af; }
     .sc-link {
       position: absolute;
       bottom: 10px;
@@ -179,23 +274,7 @@
       opacity: 0;
       transition: opacity 0.15s;
     }
-    .sc:hover .sc-link {
-      opacity: 1;
-    }
-
-    /* Pending card */
-    .sc-pending {
-      background: #fafbfc;
-      border: 1px dashed #dde3ec;
-      border-radius: 8px;
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #c0c7d0;
-      font-size: 12px;
-      min-height: 80px;
-    }
+    .sc:hover .sc-link { opacity: 1; }
 
     @media (max-width: 900px) {
       .cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -204,145 +283,224 @@
     }
     @media (max-width: 500px) {
       .cards-grid { grid-template-columns: 1fr; }
+      .lock-box { width: 90vw; padding: 32px 24px 28px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="page-head">
-    <div class="page-title-row">
-      <div class="title-bar"></div>
-      <span class="page-title">业务场景导航中心</span>
-    </div>
-    <div class="page-sub">
-      覆盖大社区 · 大商业 · 大基建 · 大审核 四大核心场景 &nbsp;｜&nbsp; 快速访问各业务场景内帐下钻分析与机会点推演
-    </div>
-    <div class="tab-row">
-      <div class="tab">全部场景</div>
+  <!-- ══ LOCK SCREEN ══ -->
+  <div id="lock-screen">
+    <div class="lock-box">
+      <div class="lock-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b7dd8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div class="lock-title">业务场景导航中心</div>
+      <div class="lock-sub">此页面受密码保护，请输入访问密码继续</div>
+      <div class="lock-input-wrap">
+        <input id="pwd-input" class="lock-input" type="password" placeholder="请输入访问密码" autocomplete="off" />
+        <button class="eye-btn" id="eye-btn" type="button" title="显示/隐藏密码">
+          <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <button class="lock-btn" id="unlock-btn">进 入</button>
+      <div class="lock-err" id="lock-err"></div>
     </div>
   </div>
 
-  <div class="content">
+  <!-- ══ MAIN APP ══ -->
+  <div id="app">
 
-    <!-- 大社区 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name">
-          <div class="group-dot dot-blue"></div>大社区
-        </div>
-        <span class="group-count">3 个常规场景</span>
+    <div class="page-head">
+      <div class="page-title-row">
+        <div class="title-bar"></div>
+        <span class="page-title">业务场景导航中心</span>
       </div>
-      <div class="cards-grid">
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-blue"></div>
-          <span class="sc-badge badge-blue">常规场景</span>
-          <div class="sc-name">社区</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-blue"></div>
-          <span class="sc-badge badge-blue">常规场景</span>
-          <div class="sc-name">搜索</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-blue"></div>
-          <span class="sc-badge badge-blue">常规场景</span>
-          <div class="sc-name">推荐</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
+      <div class="page-sub">
+        覆盖大社区 · 大商业 · 大基建 · 大审核 四大核心场景 &nbsp;｜&nbsp; 快速访问各业务场景内帐下钻分析与机会点推演
+      </div>
+      <div class="tab-row">
+        <div class="tab">全部场景</div>
       </div>
     </div>
 
-    <!-- 大商业 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name">
-          <div class="group-dot dot-teal"></div>大商业
-        </div>
-        <span class="group-count">2 个常规场景</span>
-      </div>
-      <div class="cards-grid">
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-teal"></div>
-          <span class="sc-badge badge-teal">常规场景</span>
-          <div class="sc-name">广告</div>
-          <div class="sc-bp">科斯</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-teal"></div>
-          <span class="sc-badge badge-teal">常规场景</span>
-          <div class="sc-name">交易</div>
-          <div class="sc-bp">科斯</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-      </div>
-    </div>
+    <div class="content">
 
-    <!-- 大基建 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name">
-          <div class="group-dot dot-green"></div>大基建
+      <!-- 大社区 -->
+      <div class="group-card">
+        <div class="group-head">
+          <div class="group-name"><div class="group-dot dot-blue"></div>大社区</div>
+          <span class="group-count">3 个常规场景</span>
         </div>
-        <span class="group-count">4 个常规场景</span>
-      </div>
-      <div class="cards-grid">
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">常规场景</span>
-          <div class="sc-name">基建</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="https://angelchang-dashboard.github.io/infra-dashboard/" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">常规场景</span>
-          <div class="sc-name">数据</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">常规场景</span>
-          <div class="sc-name">风控</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-green"></div>
-          <span class="sc-badge badge-green">常规场景</span>
-          <div class="sc-name">多媒体</div>
-          <div class="sc-bp">安玖</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- 大审核 -->
-    <div class="group-card">
-      <div class="group-head">
-        <div class="group-name">
-          <div class="group-dot dot-purple"></div>大审核
+        <div class="cards-grid">
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-blue"></div>
+            <span class="sc-badge badge-blue">常规场景</span>
+            <div class="sc-name">社区</div>
+            <div class="sc-bp">月兔</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-blue"></div>
+            <span class="sc-badge badge-blue">常规场景</span>
+            <div class="sc-name">搜索</div>
+            <div class="sc-bp">月兔</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-blue"></div>
+            <span class="sc-badge badge-blue">常规场景</span>
+            <div class="sc-name">推荐</div>
+            <div class="sc-bp">月兔</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
         </div>
-        <span class="group-count">1 个常规场景</span>
       </div>
-      <div class="cards-grid">
-        <a class="sc" href="#" target="_blank">
-          <div class="sc-top-line line-purple"></div>
-          <span class="sc-badge badge-purple">常规场景</span>
-          <div class="sc-name">机审平台</div>
-          <div class="sc-bp">月兔</div>
-          <span class="sc-link">进入 Dashboard ↗</span>
-        </a>
-      </div>
-    </div>
 
+      <!-- 大商业 -->
+      <div class="group-card">
+        <div class="group-head">
+          <div class="group-name"><div class="group-dot dot-teal"></div>大商业</div>
+          <span class="group-count">2 个常规场景</span>
+        </div>
+        <div class="cards-grid">
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-teal"></div>
+            <span class="sc-badge badge-teal">常规场景</span>
+            <div class="sc-name">广告</div>
+            <div class="sc-bp">科斯</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-teal"></div>
+            <span class="sc-badge badge-teal">常规场景</span>
+            <div class="sc-name">交易</div>
+            <div class="sc-bp">科斯</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 大基建 -->
+      <div class="group-card">
+        <div class="group-head">
+          <div class="group-name"><div class="group-dot dot-green"></div>大基建</div>
+          <span class="group-count">4 个常规场景</span>
+        </div>
+        <div class="cards-grid">
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <span class="sc-badge badge-green">常规场景</span>
+            <div class="sc-name">基建</div>
+            <div class="sc-bp">安玖</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="https://angelchang-dashboard.github.io/infra-dashboard/" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <span class="sc-badge badge-green">常规场景</span>
+            <div class="sc-name">数据</div>
+            <div class="sc-bp">安玖</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <span class="sc-badge badge-green">常规场景</span>
+            <div class="sc-name">风控</div>
+            <div class="sc-bp">安玖</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-green"></div>
+            <span class="sc-badge badge-green">常规场景</span>
+            <div class="sc-name">多媒体</div>
+            <div class="sc-bp">安玖</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 大审核 -->
+      <div class="group-card">
+        <div class="group-head">
+          <div class="group-name"><div class="group-dot dot-purple"></div>大审核</div>
+          <span class="group-count">1 个常规场景</span>
+        </div>
+        <div class="cards-grid">
+          <a class="sc" href="#" target="_blank">
+            <div class="sc-top-line line-purple"></div>
+            <span class="sc-badge badge-purple">常规场景</span>
+            <div class="sc-name">机审平台</div>
+            <div class="sc-bp">月兔</div>
+            <span class="sc-link">进入 Dashboard ↗</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
   </div>
+
+  <script>
+    (function () {
+      var PASS = 'techchangeworld';
+      var SESSION_KEY = 'portal_auth';
+
+      var lockEl  = document.getElementById('lock-screen');
+      var appEl   = document.getElementById('app');
+      var input   = document.getElementById('pwd-input');
+      var btn     = document.getElementById('unlock-btn');
+      var errEl   = document.getElementById('lock-err');
+      var eyeBtn  = document.getElementById('eye-btn');
+      var eyeIcon = document.getElementById('eye-icon');
+
+      // 已验证过则直接跳过
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        lockEl.classList.add('hidden');
+        appEl.classList.add('visible');
+        return;
+      }
+
+      function unlock() {
+        var val = input.value.trim();
+        if (val === PASS) {
+          sessionStorage.setItem(SESSION_KEY, '1');
+          lockEl.classList.add('hidden');
+          appEl.classList.add('visible');
+        } else {
+          errEl.textContent = '密码错误，请重试';
+          input.classList.add('error');
+          input.value = '';
+          setTimeout(function () {
+            input.classList.remove('error');
+            errEl.textContent = '';
+          }, 1500);
+          input.focus();
+        }
+      }
+
+      btn.addEventListener('click', unlock);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') unlock();
+      });
+
+      // 显示/隐藏密码
+      eyeBtn.addEventListener('click', function () {
+        if (input.type === 'password') {
+          input.type = 'text';
+          eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+        } else {
+          input.type = 'password';
+          eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        }
+      });
+
+      input.focus();
+    })();
+  </script>
 
 </body>
 </html>

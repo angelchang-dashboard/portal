@@ -362,9 +362,10 @@
 
       // 免密条件：
       // 1. 本次 session 已验证过
-      // 2. 有 referrer（从其他页面跳转过来的）
-      var hasReferrer = document.referrer && document.referrer.length > 0;
-      if (sessionStorage.getItem(KEY) === '1' || hasReferrer) {
+      // 2. URL 携带正确的 access token
+      var params = new URLSearchParams(window.location.search);
+      var accessToken = params.get('access');
+      if (sessionStorage.getItem(KEY) === '1' || accessToken === 'soinIBYI-ZJ8YG-HNtXAQA') {
         showApp(); return;
       }
 
